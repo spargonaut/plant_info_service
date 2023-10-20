@@ -33,3 +33,20 @@ func (app *application) healthcheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (app *application) getPlantsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
+
+	fmt.Fprintln(w, "Display a list of the plants")
+}
+
+func (app *application) createPlantHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
+	fmt.Fprintln(w, "Added a new plant")
+}
