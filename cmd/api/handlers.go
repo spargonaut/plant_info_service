@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -83,5 +84,32 @@ func (app *application) createPlantHandler(w http.ResponseWriter, r *http.Reques
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
-	fmt.Fprintln(w, "Added a new plant")
+
+	var input struct {
+		Name                  string  `json:"name"`
+		CommonName            string  `json:"common_name"`
+		SeedCompany           string  `json:"seed_company"`
+		ExpectedDaysToHarvest int32   `json:"expected_days_to_harvest"`
+		Type                  string  `json:"(harvest once|cut and come again)"`
+		PhLow                 float32 `json:"ph_low"`
+		PhHigh                float32 `json:"ph_high"`
+		ECLow                 float32 `json:"ec_low"`
+		ECHigh                float32 `json:"ec_high"`
+	}
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		fmt.Printf("Read Error")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	err = json.Unmarshal(body, &input)
+	if err != nil {
+		fmt.Printf("Unmarshall Error")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	fmt.Fprintf(w, "%v\n", input)
 }
