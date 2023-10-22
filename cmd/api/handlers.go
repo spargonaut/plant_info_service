@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"io"
 	"net/http"
 	"time"
@@ -86,11 +87,11 @@ func (app *application) createPlantHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	var input struct {
-		Name                  string  `json:"name"`
-		CommonName            string  `json:"common_name"`
-		SeedCompany           string  `json:"seed_company"`
-		ExpectedDaysToHarvest int32   `json:"expected_days_to_harvest"`
-		Type                  string  `json:"(harvest once|cut and come again)"`
+		Name                  string  `json:"name,omitempty" validate:"required"`
+		CommonName            string  `json:"common_name" validate:"required"`
+		SeedCompany           string  `json:"seed_company" validate:"required"`
+		ExpectedDaysToHarvest int32   `json:"expected_days_to_harvest" validate:"required"`
+		Type                  string  `json:"type" validate:"oneof=harvest_once cut_and_come_again"`
 		PhLow                 float32 `json:"ph_low"`
 		PhHigh                float32 `json:"ph_high"`
 		ECLow                 float32 `json:"ec_low"`
@@ -107,6 +108,21 @@ func (app *application) createPlantHandler(w http.ResponseWriter, r *http.Reques
 	err = json.Unmarshal(body, &input)
 	if err != nil {
 		fmt.Printf("Unmarshall Error")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	err = validate.Struct(input)
+	if err != nil {
+		fmt.Println("there was a validation error")
+		for _, err := range err.(validator.ValidationErrors) {
+			fmt.Printf("field %s is %s\n", err.Field(), err.ActualTag())
+			if err.Value() != "" {
+				fmt.Printf("\"%s\" not found in %s ", err.Value(), err.Param())
+			}
+			fmt.Println()
+		}
+
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}

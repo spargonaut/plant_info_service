@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"log"
 	"net/http"
 	"os"
@@ -21,6 +22,8 @@ type application struct {
 	logger *log.Logger
 }
 
+var validate *validator.Validate
+
 func main() {
 	var cfg config
 
@@ -36,6 +39,7 @@ func main() {
 	}
 
 	addr := fmt.Sprintf(":%d", cfg.port)
+	validate = validator.New(validator.WithRequiredStructEnabled())
 
 	srv := &http.Server{
 		Addr:         addr,
