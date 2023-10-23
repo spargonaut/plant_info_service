@@ -1,0 +1,54 @@
+
+export PLANTINFO_DB_DSN='postgres://farmer:pa55w0rd@localhost/plantinfo?sslmode=disable'
+
+//------------------------------------------------------
+
+docker run --name plant-info-db -e POSTGRES_PASSWORD=mysecretpassword -d -p 5432:5432 postgres
+
+//------------------------------------------------------
+
+psql -h localhost -p 5432 -U postgres
+
+//------------------------------------------------------
+
+CREATE DATABASE plantinfo;
+
+CREATE ROLE farmer WITH LOGIN PASSWORD 'pa55w0rd';
+
+\c plantinfo
+
+CREATE TABLE IF NOT EXISTS plants (
+    id bigserial PRIMARY KEY,
+    created_at timestamp(0) with time zone NOT NULL DEFAULT NOW(),
+    name text NOT NULL,
+    common_name text NOT NULL,
+    seed_company text NOT NULL,
+    expected_days_to_harvest integer NOT NULL,
+    type text NOT NULL,
+    ph_low real NOT NULL,
+    ph_high real NOT NULL,
+    ec_low real NOT NULL,
+    ec_high real NOT NULL,
+    version integer NOT NULL DEFAULT 1
+);
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON plants TO farmer;
+
+GRANT USAGE, SELECT ON SEQUENCE plants_id_seq TO farmer;
+
+//------------------------------------------------------
+BODY='{
+    "id": 23,
+    "name": "Speedy - Salad Arugula - Gourmet Greens",
+    "common_name": "Speedy Arugula",
+    "seed_company": "Territorial",
+    "expected_days_to_harvest": 30,
+    "type": "harvest_once",
+    "ph_low": 6,
+    "ph_high": 7.5,
+    "ec_low": 0.8,
+    "ec_high": 1.2
+}'
+
+
+
