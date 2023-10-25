@@ -48,3 +48,48 @@ func (p PlantProfile) Insert(plant *Plant) error {
 
 	return p.DB.QueryRow(query, args...).Scan(&plant.ID, &plant.CreatedAt, &plant.Version)
 }
+
+func (p PlantProfile) GetAll() ([]*Plant, error) {
+	query := `
+		SELECT *
+		FROM plants
+		ORDER BY id`
+
+	rows, err := p.DB.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	plants := []*Plant{}
+
+	for rows.Next() {
+		var plant Plant
+		err := rows.Scan(
+			&plant.ID,
+			&plant.CreatedAt,
+			&plant.Name,
+			&plant.CommonName,
+			&plant.SeedCompany,
+			&plant.ExpectedDaysToHarvest,
+			&plant.Type,
+			&plant.PhLow,
+			&plant.PhHigh,
+			&plant.ECLow,
+			&plant.ECHigh,
+			&plant.Version,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		plants = append(plants, &plant)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return plants, nil
+}

@@ -4,11 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-playground/validator/v10"
+	"github.com/spargonaut/plant_info_service/internal/data"
 	"io"
 	"net/http"
-	"time"
-
-	"github.com/spargonaut/plant_info_service/internal/data"
 )
 
 type envelope map[string]any
@@ -47,21 +45,10 @@ func (app *application) getPlantsHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	plants := []data.Plant{
-		{
-			ID:                    23,
-			CreatedAt:             time.Now(),
-			Name:                  "Speedy - Salad Arugula - Gourmet Greens",
-			CommonName:            "Speedy Arugula",
-			SeedCompany:           "Territorial",
-			ExpectedDaysToHarvest: 30,
-			Type:                  "harvest once",
-			PhLow:                 6,
-			PhHigh:                7.5,
-			ECLow:                 0.8,
-			ECHigh:                1.2,
-			Version:               1,
-		},
+	plants, err := app.profiles.Plants.GetAll()
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
 
 	js, err := json.MarshalIndent(envelope{"plants": plants}, "", "\t")
@@ -147,5 +134,5 @@ func (app *application) createPlantHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("plant profile created"))
+	w.Write([]byte("plant profile created\n"))
 }
