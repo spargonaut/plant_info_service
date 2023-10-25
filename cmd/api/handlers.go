@@ -127,5 +127,25 @@ func (app *application) createPlantHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	fmt.Fprintf(w, "%v\n", input)
+	plant := &data.Plant{
+		Name:                  input.Name,
+		CommonName:            input.CommonName,
+		SeedCompany:           input.SeedCompany,
+		ExpectedDaysToHarvest: input.ExpectedDaysToHarvest,
+		Type:                  input.Type,
+		PhLow:                 input.PhLow,
+		PhHigh:                input.PhHigh,
+		ECLow:                 input.ECLow,
+		ECHigh:                input.ECHigh,
+	}
+
+	err = app.profiles.Plants.Insert(plant)
+	if err != nil {
+		fmt.Println("Insert Error")
+		fmt.Println(err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte("plant profile created"))
 }
