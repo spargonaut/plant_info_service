@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/go-playground/validator/v10"
+	"github.com/spargonaut/plant_info_service/internal/data"
 	"log"
 	"net/http"
 	"os"
@@ -22,8 +23,9 @@ type config struct {
 }
 
 type application struct {
-	config config
-	logger *log.Logger
+	config   config
+	logger   *log.Logger
+	profiles data.Models
 }
 
 var validate *validator.Validate
@@ -37,11 +39,6 @@ func main() {
 	flag.Parse()
 
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
-
-	app := &application{
-		config: cfg,
-		logger: logger,
-	}
 
 	db, err := sql.Open("postgres", cfg.dsn)
 	if err != nil {
@@ -61,6 +58,12 @@ func main() {
 	}
 
 	logger.Println("database connection pool established")
+
+	app := &application{
+		config:   cfg,
+		logger:   logger,
+		profiles: data.NewModels(db),
+	}
 
 	addr := fmt.Sprintf(":%d", cfg.port)
 	validate = validator.New(validator.WithRequiredStructEnabled())
