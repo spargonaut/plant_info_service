@@ -2,6 +2,7 @@ package data
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 )
@@ -92,4 +93,30 @@ func (p PlantProfile) GetAll() ([]*Plant, error) {
 	}
 
 	return plants, nil
+}
+
+func (p PlantProfile) Delete(id int64) error {
+	if id < 1 {
+		return errors.New("record not found")
+	}
+
+	query := `
+		DELETE FROM plants
+		WHERE id = $1`
+
+	results, err := p.DB.Exec(query, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := results.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return errors.New("record not found")
+	}
+
+	return nil
 }

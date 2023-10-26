@@ -7,6 +7,7 @@ import (
 	"github.com/spargonaut/plant_info_service/internal/data"
 	"io"
 	"net/http"
+	"strconv"
 )
 
 type envelope map[string]any
@@ -135,4 +136,47 @@ func (app *application) createPlantHandler(w http.ResponseWriter, r *http.Reques
 	}
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("plant profile created\n"))
+}
+
+func (app *application) deletePlantHandler(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodDelete {
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
+
+	id := r.URL.Path[len("/v1/plant/"):]
+	idInt, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+	}
+
+	err = app.profiles.Plants.Delete(idInt)
+	if err != nil {
+		switch {
+		case err.Error() == "record not found":
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		default:
+			fmt.Println(err)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	js, err := json.MarshalIndent(envelope{"message": "plant successfully deleted", "id": id}, "", "\t")
+	if err != nil {
+		fmt.Println("Error marshaling")
+		fmt.Println(err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	js = append(js, '\n')
+	w.Header().Set("Content-Type", "application/json")
+	_, err = w.Write(js)
+	if err != nil {
+		fmt.Println("Error writing the DELETE plants response.")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 }
