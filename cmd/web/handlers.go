@@ -10,7 +10,29 @@ import (
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "the home page")
+	if r.Method != http.MethodGet {
+		fmt.Println("http method error")
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
+
+	if r.URL.Path != "/favicon.ico" && r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
+
+	plants, err := app.plantInfo.GetAll()
+	if err != nil {
+		fmt.Println("error getting all plants")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprintf(w, "<html><head><title>Plant List</title></head><body><h1>Plant List</h1><ul>")
+	for _, plant := range *plants {
+		fmt.Fprintf(w, "<li>%s (%d)</li>", plant.CommonName, plant.ExpectedDaysToHarvest)
+	}
+	fmt.Fprintf(w, "</ul></body></html>")
 }
 
 func (app *application) createPlant(w http.ResponseWriter, r *http.Request) {
