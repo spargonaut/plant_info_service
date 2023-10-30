@@ -141,7 +141,7 @@ func (app *application) createPlantProcess(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	req, _ := http.NewRequest("POST", app.plantList.Endpoint, bytes.NewBuffer(data))
+	req, _ := http.NewRequest("POST", app.plantInfo.CommandEndpoint, bytes.NewBuffer(data))
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}

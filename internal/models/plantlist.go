@@ -1,5 +1,5 @@
 package models
 
-type PlantListModel struct {
-	Endpoint string
+type PlantProfile struct {
+	CommandEndpoint string
 }
