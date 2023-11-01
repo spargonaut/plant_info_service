@@ -1,0 +1,10 @@
+{{define "title"}}Delete a Plant{{end}}
+
+{{define "main"}}
+    <form action="/plant/delete" method="post">
+        <label for="id">Plant ID:&nbsp</label>
+        <input type="text" name="id" id="id">&nbsp
+        <button type="submit">Delete</button>
+    </form>
+
+{{end}}

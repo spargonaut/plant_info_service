@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -28,11 +29,25 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "<html><head><title>Plant List</title></head><body><h1>Plant List</h1><ul>")
-	for _, plant := range *plants {
-		fmt.Fprintf(w, "<li>%s (%d)</li>", plant.CommonName, plant.ExpectedDaysToHarvest)
+	files := []string{
+		"./ui/html/base.html",
+		"./ui/html/partials/nav.html",
+		"./ui/html/pages/home.html",
 	}
-	fmt.Fprintf(w, "</ul></body></html>")
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		log.Print(err.Error())
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	err = ts.ExecuteTemplate(w, "base", plants)
+	if err != nil {
+		log.Print(err.Error())
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 }
 
 func (app *application) createPlant(w http.ResponseWriter, r *http.Request) {
@@ -47,18 +62,24 @@ func (app *application) createPlant(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) createPlantForm(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "<html><head><title>Create Plant</title></head>"+
-		"<body><h1>Create Plant</h1><form action=\"/plant/create\" method=\"post\">"+
-		"<label for=\"name\">Name</label><input type=\"text\" name=\"name\" id=\"name\">"+
-		"<label for=\"common_name\">Common Name</label><input type=\"text\" name=\"common_name\" id=\"common_name\">"+
-		"<label for=\"seed_company\">Seed Company</label><input type=\"text\" name=\"seed_company\" id=\"seed_company\">"+
-		"<label for=\"expected_days_to_harvest\">Expected Days To Harvests</label><input type=\"number\" step=\"1\" name=\"expected_days_to_harvest\" id=\"expected_days_to_harvest\">"+
-		"<label for=\"type\">Type</label><input type=\"text\" name=\"type\" id=\"type\">"+
-		"<label for=\"ph_low\">PH Low</label><input type=\"number\" step=\"0.1\" name=\"ph_low\" id=\"ph_low\">"+
-		"<label for=\"ph_high\">PH High</label><input type=\"number\" step=\"0.1\" name=\"ph_high\" id=\"ph_high\">"+
-		"<label for=\"ec_low\">EC Low</label><input type=\"number\" step=\"0.1\" name=\"ec_low\" id=\"ec_low\">"+
-		"<label for=\"ec_high\">EC High</label><input type=\"number\" step=\"0.1\" name=\"ec_high\" id=\"ec_high\">"+
-		"<button type=\"submit\">Create</button></form></body></html>")
+	files := []string{
+		"./ui/html/base.html",
+		"./ui/html/partials/nav.html",
+		"./ui/html/pages/create.html",
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
+	err = ts.ExecuteTemplate(w, "base", nil)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
 }
 
 func (app *application) createPlantProcess(w http.ResponseWriter, r *http.Request) {
@@ -196,10 +217,24 @@ func (app *application) deletePlant(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) deletePlantForm(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "<html><head><title>Delete Plant</title></head>"+
-		"<body><h1>Delete Plant</h1><form action=\"/plant/delete\" method=\"post\">"+
-		"<label for=\"id\">Plant ID:&nbsp</label><input type=\"text\" name=\"id\" id=\"id\">&nbsp"+
-		"<button type=\"submit\">Delete</button></form></body></html>")
+	files := []string{
+		"./ui/html/base.html",
+		"./ui/html/partials/nav.html",
+		"./ui/html/pages/delete.html",
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
+	err = ts.ExecuteTemplate(w, "base", nil)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
 }
 
 func (app *application) deletePlantProcess(w http.ResponseWriter, r *http.Request) {

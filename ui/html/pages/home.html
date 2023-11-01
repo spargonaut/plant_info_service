@@ -1,0 +1,28 @@
+{{define "title"}}Home{{end}}
+
+{{define "main"}}
+<article>
+    {{if .}}
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Common Name</th>
+            <th>Seed Company</th>
+            <th>Days to Harvest</th>
+            <th>Type</th>
+        </tr>
+        {{range .}}
+        <tr>
+            <td>{{.Name}}</td>
+            <td>{{.CommonName}}</td>
+            <td>{{.SeedCompany}}</td>
+            <td>{{.ExpectedDaysToHarvest}}</td>
+            <td>{{.Type}}</td>
+        </tr>
+        {{end}}
+    </table>
+    {{else}}
+    <p>There's nothing to see here yet!</p>
+    {{end}}
+</article>
+{{end}}

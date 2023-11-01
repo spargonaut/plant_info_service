@@ -1,0 +1,33 @@
+{{define "title"}}Add a Plant{{end}}
+
+{{define "main"}}
+    <form action='/plant/create' method='Post'>
+        <label>Name:</label>
+        <input type="text" name="name"><br>
+        <label>Common Name:</label>
+        <input type="text" name="common_name"><br>
+        <label>Seed Co:</label>
+        <input type="text" name="seed_company"><br>
+        <label>Days to Harvest:</label>
+        <input type="number" name="expected_days_to_harvest"><br>
+        <label>Type:</label>
+        <select name="type" id="type">
+            <option value="">-- Choose Harvest Type --</option>
+            <option value="harvest_once">Harvest Once</option>
+            <option value="cut_and_come_again">Cut and Come Again</option>
+        </select>
+        <br />
+        <label>pH Low:</label>
+        <input type="number" step="0.1" name="ph_low"><br>
+        <label>pH High:</label>
+        <input type="number" step="0.1" name="ph_high"><br>
+        <label>EC Low:</label>
+        <input type="number" step="0.1" name="ec_low"><br>
+        <label>EC High:</label>
+        <input type="number" step="0.1" name="ec_high"><br>
+        <div class="button-center">
+            <button type="submit">Submit</button>
+        </div>
+
+    </form>
+{{end}}
