@@ -183,3 +183,51 @@ func (app *application) createPlantProcess(w http.ResponseWriter, r *http.Reques
 
 	http.Redirect(w, r, "/plant/create", http.StatusSeeOther)
 }
+
+func (app *application) deletePlant(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		app.deletePlantForm(w, r)
+	case http.MethodPost:
+		app.deletePlantProcess(w, r)
+	default:
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+	}
+}
+
+func (app *application) deletePlantForm(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "<html><head><title>Delete Plant</title></head>"+
+		"<body><h1>Delete Plant</h1><form action=\"/plant/delete\" method=\"post\">"+
+		"<label for=\"id\">Plant ID:&nbsp</label><input type=\"text\" name=\"id\" id=\"id\">&nbsp"+
+		"<button type=\"submit\">Delete</button></form></body></html>")
+}
+
+func (app *application) deletePlantProcess(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("processing the delete plant form")
+	plantId := r.PostFormValue("id")
+	if plantId == "" {
+		fmt.Println("plantId error")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	req, _ := http.NewRequest("DELETE", app.plantInfo.CommandEndpoint+"/"+plantId, nil)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("client.do error")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		log.Printf("unexpected status: %s", resp.Status)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
