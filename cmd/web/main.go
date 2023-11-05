@@ -29,6 +29,8 @@ func main() {
 	}
 
 	log.Printf("Starting the server on %s", *addr)
+	log.Printf("Using command endpoint: %s", app.plantInfo.CommandEndpoint)
+	log.Printf("Using query endpoint is: %s", app.plantInfo.QueryEndpoint)
 	err := srv.ListenAndServe()
 	log.Fatal(err)
 }
