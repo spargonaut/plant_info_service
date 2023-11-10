@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  database:
+    container_name: plantinfo-postgres
+    restart: always
+    image: postgres:latest
+    volumes:
+      - ./plantinfo-database/data:/var/lib/postgresql/data
+      - ./plantinfo-database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - ${POSTGRES_PORT:-5432}:5432
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-tester}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aTestingPassword}
+      POSTGRES_ROOT_PASSWORD: ${POSTGRES_ROOT_PASSWORD:-mysecretpassword}
+
+  api:
+    container_name: plantinfo-profiles-api
+    environment:
+      PLANTINFO_DB_DSN: "postgres://${POSTGRES_USER:-tester}:${POSTGRES_PASSWORD:-aTestingPassword}@database/${POSTGRES_DB:-plantinfo}?sslmode=disable"
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: plantinfo.api.Dockerfile
+    ports:
+      - 4000:4000
+    depends_on:
+      - database
+
+  web:
+    container_name: plantinfo-profiles-web
+    restart: unless-stopped
+    command: --commandEndpoint="${CMD_ENDPOINT:-http://api:4000/v1/plant}" --queryEndpoint="${QRY_ENDPOINT:-http://api:4000/v1/plants}"
+    build:
+      context: .
+      dockerfile: plantinfo.web.Dockerfile
+    ports:
+      - 8090:8090
+    depends_on:
+      - api
