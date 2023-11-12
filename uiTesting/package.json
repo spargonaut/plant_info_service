@@ -1,0 +1,14 @@
+{
+  "name": "uitesting",
+  "version": "1.0.0",
+  "description": "cypress tests to test user flows of the plant info application",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "james spargo",
+  "license": "ISC",
+  "devDependencies": {
+    "cypress": "^13.5.0"
+  }
+}
