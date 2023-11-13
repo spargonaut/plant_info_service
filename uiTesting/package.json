@@ -4,7 +4,8 @@
   "description": "cypress tests to test user flows of the plant info application",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "cypress run",
+    "cypress:open": "cypress open"
   },
   "author": "james spargo",
   "license": "ISC",
