@@ -5,6 +5,7 @@
     {{if .}}
     <table>
         <tr>
+            <th>ID</th>
             <th>Name</th>
             <th>Common Name</th>
             <th>Seed Company</th>
@@ -13,6 +14,7 @@
         </tr>
         {{range .}}
         <tr>
+            <td>{{.ID}}</td>
             <td>{{.Name}}</td>
             <td>{{.CommonName}}</td>
             <td>{{.SeedCompany}}</td>

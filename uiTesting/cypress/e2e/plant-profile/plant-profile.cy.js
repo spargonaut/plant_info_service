@@ -82,7 +82,7 @@ describe('Plant Profiles', () => {
             .find("tr")
             .eq(1)
 
-        let tdIndex = 0
+        let tdIndex = 1
         row2.get('td').eq(tdIndex++)
             .should('have.text', 'Latin Test Plant Name')
 
