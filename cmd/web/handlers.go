@@ -202,7 +202,7 @@ func (app *application) createPlantProcess(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	http.Redirect(w, r, "/plant/create", http.StatusSeeOther)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func (app *application) deletePlant(w http.ResponseWriter, r *http.Request) {

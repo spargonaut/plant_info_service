@@ -65,12 +65,6 @@ describe('Plant Profiles', () => {
             .click()
 
         // check the list of plants to see if the test plant is there
-        cy.get('nav ul li')
-            .eq(0)
-            .should('have.text', 'Home')
-            .click()
-
-        // check number of rows in the table
         cy.get("table")
             .find("tr")
             .then((row) => {
