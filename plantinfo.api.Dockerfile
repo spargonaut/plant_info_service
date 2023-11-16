@@ -11,7 +11,7 @@ WORKDIR $SRC_DIR
 
 COPY . .
 
-RUN go build -a -o plantinfo-api ./services/api
+RUN go build -a -o plantinfo-api ./services/plant-profile-api
 
 
 FROM alpine:3.18.3
