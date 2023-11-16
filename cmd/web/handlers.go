@@ -259,9 +259,7 @@ func (app *application) deletePlantProcess(w http.ResponseWriter, r *http.Reques
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		log.Printf("unexpected status: %s", resp.Status)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
+		log.Printf("unexpected status: %s when attempting to delete ID: %s", resp.Status, plantId)
 	}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
