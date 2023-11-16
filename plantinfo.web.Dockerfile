@@ -11,7 +11,7 @@ WORKDIR $SRC_DIR
 
 COPY . .
 
-RUN go build -a -o plantinfo-web ./cmd/web
+RUN go build -a -o plantinfo-web ./services/web
 
 
 FROM alpine:3.18.3
