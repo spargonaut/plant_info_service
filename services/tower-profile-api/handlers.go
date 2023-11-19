@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/spargonaut/plant_info_service/internal/data"
+	"io"
 	"net/http"
 	"time"
 )
@@ -79,5 +80,29 @@ func (app *application) createGrowTowerHandler(w http.ResponseWriter, r *http.Re
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
-	fmt.Fprintln(w, "Added a new grow tower")
+
+	var input struct {
+		Name         string  `json:"name,omitempty"`
+		Type         string  `json:"type"`
+		TargetPhLow  float32 `json:"target_ph_low,omitempty"`
+		TargetPhHigh float32 `json:"target_ph_high,omitempty"`
+		TargetECLow  float32 `json:"target_ec_low,omitempty"`
+		TargetECHigh float32 `json:"target_ec_high,omitempty"`
+	}
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		fmt.Printf("Read Error")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	err = json.Unmarshal(body, &input)
+	if err != nil {
+		fmt.Printf("Unmarshall Error")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	fmt.Fprintf(w, "%v\n", input)
 }
