@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"github.com/spargonaut/plant_info_service/internal/data"
 	"io"
 	"net/http"
@@ -82,8 +83,8 @@ func (app *application) createGrowTowerHandler(w http.ResponseWriter, r *http.Re
 	}
 
 	var input struct {
-		Name         string  `json:"name,omitempty"`
-		Type         string  `json:"type"`
+		Name         string  `json:"name" validate:"required"`
+		Type         string  `json:"type"  validate:"required"`
 		TargetPhLow  float32 `json:"target_ph_low,omitempty"`
 		TargetPhHigh float32 `json:"target_ph_high,omitempty"`
 		TargetECLow  float32 `json:"target_ec_low,omitempty"`
@@ -100,6 +101,21 @@ func (app *application) createGrowTowerHandler(w http.ResponseWriter, r *http.Re
 	err = json.Unmarshal(body, &input)
 	if err != nil {
 		fmt.Printf("Unmarshall Error")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	err = validate.Struct(input)
+	if err != nil {
+		fmt.Println("there was a validation error")
+		for _, err := range err.(validator.ValidationErrors) {
+			fmt.Printf("field %s is %s\n", err.Field(), err.ActualTag())
+			if err.Value() != "" {
+				fmt.Printf("\"%s\" not found in %s ", err.Value(), err.Param())
+			}
+			fmt.Println()
+		}
+
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
