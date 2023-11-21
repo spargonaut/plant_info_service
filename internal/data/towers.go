@@ -1,6 +1,7 @@
 package data
 
 import (
+	"database/sql"
 	"time"
 )
 
@@ -14,4 +15,8 @@ type GrowTower struct {
 	TargetECLow  float32   `json:"target_ec_low,omitempty"`
 	TargetECHigh float32   `json:"target_ec_high,omitempty"`
 	Version      int32     `json:"-"`
+}
+
+type GrowTowerProfile struct {
+	DB *sql.DB
 }
