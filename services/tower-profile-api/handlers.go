@@ -7,7 +7,6 @@ import (
 	"github.com/spargonaut/plant_info_service/internal/data"
 	"io"
 	"net/http"
-	"time"
 )
 
 func (app *application) healthcheck(w http.ResponseWriter, r *http.Request) {
@@ -46,18 +45,10 @@ func (app *application) getGrowTowersHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	towers := []data.GrowTower{
-		{
-			ID:           23,
-			CreatedAt:    time.Now(),
-			Name:         "Lettuce Tower",
-			Type:         "FarmStand",
-			TargetPhLow:  6,
-			TargetPhHigh: 7.5,
-			TargetECLow:  0.8,
-			TargetECHigh: 1.2,
-			Version:      1,
-		},
+	towers, err := app.profiles.GrowTowers.GetAll()
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
 
 	js, err := json.MarshalIndent(envelope{"towers": towers}, "", "\t")

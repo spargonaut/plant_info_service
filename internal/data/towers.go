@@ -42,3 +42,45 @@ func (p GrowTowerProfile) Insert(growTower *GrowTower) error {
 
 	return p.DB.QueryRow(query, args...).Scan(&growTower.ID, &growTower.CreatedAt, &growTower.Version)
 }
+
+func (gt GrowTowerProfile) GetAll() ([]*GrowTower, error) {
+	query := `
+		SELECT *
+		FROM growtowers
+		ORDER BY id`
+
+	rows, err := gt.DB.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	towers := []*GrowTower{}
+
+	for rows.Next() {
+		var tower GrowTower
+		err := rows.Scan(
+			&tower.ID,
+			&tower.CreatedAt,
+			&tower.Name,
+			&tower.Type,
+			&tower.TargetPhLow,
+			&tower.TargetPhHigh,
+			&tower.TargetECLow,
+			&tower.TargetECHigh,
+			&tower.Version,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		towers = append(towers, &tower)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return towers, nil
+}
