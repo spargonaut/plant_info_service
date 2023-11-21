@@ -25,7 +25,7 @@ type config struct {
 type application struct {
 	config   config
 	logger   *log.Logger
-	profiles data.Models
+	profiles data.PlantProfileModels
 }
 
 var validate *validator.Validate
@@ -62,7 +62,7 @@ func main() {
 	app := &application{
 		config:   cfg,
 		logger:   logger,
-		profiles: data.NewModels(db),
+		profiles: data.NewPlantProfileModels(db),
 	}
 
 	addr := fmt.Sprintf(":%d", cfg.port)

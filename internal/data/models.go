@@ -2,12 +2,12 @@ package data
 
 import "database/sql"
 
-type Models struct {
+type PlantProfileModels struct {
 	Plants PlantProfile
 }
 
-func NewModels(db *sql.DB) Models {
-	return Models{
+func NewPlantProfileModels(db *sql.DB) PlantProfileModels {
+	return PlantProfileModels{
 		Plants: PlantProfile{DB: db},
 	}
 }
