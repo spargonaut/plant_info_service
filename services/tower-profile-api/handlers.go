@@ -120,5 +120,22 @@ func (app *application) createGrowTowerHandler(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	fmt.Fprintf(w, "%v\n", input)
+	tower := &data.GrowTower{
+		Name:         input.Name,
+		Type:         input.Type,
+		TargetPhLow:  input.TargetPhLow,
+		TargetPhHigh: input.TargetPhHigh,
+		TargetECLow:  input.TargetECLow,
+		TargetECHigh: input.TargetECHigh,
+	}
+
+	err = app.profiles.GrowTowers.Insert(tower)
+	if err != nil {
+		fmt.Println("Insert Error")
+		fmt.Println(err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte("grow tower profile created\n"))
 }
