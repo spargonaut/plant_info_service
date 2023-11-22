@@ -15,7 +15,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aTestingPassword}
       POSTGRES_ROOT_PASSWORD: ${POSTGRES_ROOT_PASSWORD:-mysecretpassword}
 
-  api:
+  plantinfo-api:
     container_name: plantinfo-profiles-api
     environment:
       PLANTINFO_DB_DSN: "postgres://${POSTGRES_USER:-tester}:${POSTGRES_PASSWORD:-aTestingPassword}@database/${POSTGRES_DB:-plantinfo}?sslmode=disable"
@@ -25,6 +25,19 @@ services:
       dockerfile: plantinfo.api.Dockerfile
     ports:
       - 4000:4000
+    depends_on:
+      - database
+
+  towerinfo-api:
+    container_name: towerinfo-profiles-api
+    environment:
+      GROWTOWERINFO_DB_DSN: "postgres://${POSTGRES_USER:-tester}:${POSTGRES_PASSWORD:-aTestingPassword}@database/${POSTGRES_DB:-growtowerinfo}?sslmode=disable"
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: towerinfo.api.Dockerfile
+    ports:
+      - 4001:4001
     depends_on:
       - database
 
@@ -38,4 +51,5 @@ services:
     ports:
       - 8090:8090
     depends_on:
-      - api
+      - plantinfo-api
+      - towerinfo-api
