@@ -2,6 +2,7 @@ package data
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 )
@@ -83,4 +84,30 @@ func (gt GrowTowerProfile) GetAll() ([]*GrowTower, error) {
 	}
 
 	return towers, nil
+}
+
+func (gt GrowTowerProfile) Delete(id int64) error {
+	if id < 1 {
+		return errors.New("record not found")
+	}
+
+	query := `
+		DELETE FROM growtowers
+		WHERE id = $1`
+
+	results, err := gt.DB.Exec(query, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := results.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return errors.New("record not found")
+	}
+
+	return nil
 }
