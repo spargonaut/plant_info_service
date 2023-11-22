@@ -22,7 +22,9 @@ go.work
 *.swp
 .idea
 
-api
+plant-profile-api
+tower-profile-api
+
 
 node_modules
 screenshots/
