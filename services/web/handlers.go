@@ -430,7 +430,7 @@ func (app *application) createTowerProcess(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/towers", http.StatusSeeOther)
 }
 
 func (app *application) deleteTower(w http.ResponseWriter, r *http.Request) {
