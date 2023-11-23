@@ -72,7 +72,7 @@ func (app *application) towerHome(w http.ResponseWriter, r *http.Request) {
 	files := []string{
 		"./ui/html/base.html",
 		"./ui/html/partials/nav.html",
-		"./ui/html/pages/towerlist.html",
+		"./ui/html/pages/tower-list.html",
 	}
 
 	ts, err := template.ParseFiles(files...)
@@ -105,7 +105,7 @@ func (app *application) createPlantForm(w http.ResponseWriter, r *http.Request) 
 	files := []string{
 		"./ui/html/base.html",
 		"./ui/html/partials/nav.html",
-		"./ui/html/pages/create.html",
+		"./ui/html/pages/plant-create.html",
 	}
 
 	ts, err := template.ParseFiles(files...)
@@ -260,7 +260,7 @@ func (app *application) deletePlantForm(w http.ResponseWriter, r *http.Request) 
 	files := []string{
 		"./ui/html/base.html",
 		"./ui/html/partials/nav.html",
-		"./ui/html/pages/delete.html",
+		"./ui/html/pages/plant-delete.html",
 	}
 
 	ts, err := template.ParseFiles(files...)
