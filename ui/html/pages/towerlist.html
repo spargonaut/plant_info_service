@@ -1,0 +1,32 @@
+{{define "title"}}Tower List{{end}}
+
+{{define "main"}}
+<article>
+    {{if .}}
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Target pH Low</th>
+            <th>Target pH High</th>
+            <th>Target EC Low</th>
+            <th>Target EC High</th>
+        </tr>
+        {{range .}}
+        <tr>
+            <td>{{.ID}}</td>
+            <td>{{.Name}}</td>
+            <td>{{.Type}}</td>
+            <td>{{.TargetPhLow}}</td>
+            <td>{{.TargetPhHigh}}</td>
+            <td>{{.TargetECLow}}</td>
+            <td>{{.TargetECHigh}}</td>
+        </tr>
+        {{end}}
+    </table>
+    {{else}}
+    <p>There's nothing to see here yet!</p>
+    {{end}}
+</article>
+{{end}}

@@ -50,6 +50,46 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (app *application) towerHome(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		fmt.Println("http method error")
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
+
+	if r.URL.Path != "/favicon.ico" && r.URL.Path != "/towers" {
+		http.NotFound(w, r)
+		return
+	}
+
+	towers, err := app.towerInfo.GetAll()
+	if err != nil {
+		fmt.Println("error getting all towers")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	files := []string{
+		"./ui/html/base.html",
+		"./ui/html/partials/nav.html",
+		"./ui/html/pages/towerlist.html",
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		log.Print(err.Error())
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	err = ts.ExecuteTemplate(w, "base", towers)
+	if err != nil {
+		log.Print(err.Error())
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+}
+
 func (app *application) createPlant(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:

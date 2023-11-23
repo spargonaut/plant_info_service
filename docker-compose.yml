@@ -44,7 +44,7 @@ services:
   web:
     container_name: plantinfo-profiles-web
     restart: unless-stopped
-    command: --commandEndpoint="${CMD_ENDPOINT:-http://api:4000/v1/plant}" --queryEndpoint="${QRY_ENDPOINT:-http://api:4000/v1/plants}"
+    command: --plantCmd="${PLANT_CMD:-http://plantinfo-api:4000/v1/plant}" --plantQry="${PLANT_QRY:-http://plantinfo-api:4000/v1/plants}" --towerCmd="${TOWER_CMD:-http://towerinfo-api:4001/v1/tower}" --towerQry="${TOWER_QRY:-http://towerinfo-api:4001/v1/towers}"
     build:
       context: .
       dockerfile: plantinfo.web.Dockerfile

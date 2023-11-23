@@ -9,6 +9,7 @@ func (app *application) routes() *http.ServeMux {
 	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
 
 	mux.HandleFunc("/", app.home)
+	mux.HandleFunc("/towers", app.towerHome)
 	mux.HandleFunc("/plant/create", app.createPlant)
 	mux.HandleFunc("/plant/delete", app.deletePlant)
 
