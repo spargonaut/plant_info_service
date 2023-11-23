@@ -304,3 +304,131 @@ func (app *application) deletePlantProcess(w http.ResponseWriter, r *http.Reques
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
+
+func (app *application) createTower(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		app.createTowerForm(w, r)
+	case http.MethodPost:
+		app.createTowerProcess(w, r)
+	default:
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+	}
+}
+
+func (app *application) createTowerForm(w http.ResponseWriter, r *http.Request) {
+	files := []string{
+		"./ui/html/base.html",
+		"./ui/html/partials/nav.html",
+		"./ui/html/pages/tower-create.html",
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
+	err = ts.ExecuteTemplate(w, "base", nil)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
+}
+
+func (app *application) createTowerProcess(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("processing the create tower form")
+	name := r.PostFormValue("name")
+	if name == "" {
+		fmt.Println("name error")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	towerType := r.PostFormValue("type")
+	if towerType == "" {
+		fmt.Println("tower type error")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	phLowFloat, err := strconv.ParseFloat(r.PostFormValue("target_ph_low"), 32)
+	if phLowFloat < 0.1 || err != nil {
+		fmt.Println("ph low error")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	phLow := float32(phLowFloat)
+
+	phHighFloat, err := strconv.ParseFloat(r.PostFormValue("target_ph_high"), 32)
+	if phHighFloat < 0.1 || err != nil {
+		fmt.Println("ph_high error")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	phHigh := float32(phHighFloat)
+
+	ecLowFloat, err := strconv.ParseFloat(r.PostFormValue("target_ec_low"), 32)
+	if ecLowFloat < 0.1 || err != nil {
+		fmt.Println("ec_low error")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	ecLow := float32(ecLowFloat)
+
+	ecHighFloat, err := strconv.ParseFloat(r.PostFormValue("target_ec_high"), 32)
+	if ecHighFloat < 0.1 || err != nil {
+		fmt.Println("ec_high error")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	ecHigh := float32(ecHighFloat)
+
+	tower := struct {
+		Name         string  `json:"name,omitempty"`
+		Type         string  `json:"type"`
+		TargetPhLow  float32 `json:"target_ph_low,omitempty"`
+		TargetPhHigh float32 `json:"target_ph_high,omitempty"`
+		TargetECLow  float32 `json:"target_ec_low,omitempty"`
+		TargetECHigh float32 `json:"target_ec_high,omitempty"`
+	}{
+		Name:         name,
+		Type:         towerType,
+		TargetPhLow:  phLow,
+		TargetPhHigh: phHigh,
+		TargetECLow:  ecLow,
+		TargetECHigh: ecHigh,
+	}
+
+	data, err := json.Marshal(tower)
+	if err != nil {
+		fmt.Println("Marshall error")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	req, _ := http.NewRequest("POST", app.towerInfo.CommandEndpoint, bytes.NewBuffer(data))
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("client.do error")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusCreated {
+		log.Printf("unexpected status: %s", resp.Status)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}

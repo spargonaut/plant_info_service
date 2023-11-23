@@ -1,0 +1,25 @@
+{{define "title"}}Add a Tower{{end}}
+
+{{define "page-header"}}Add a Tower{{end}}
+
+{{define "main"}}
+    <form action='/tower/create' method='Post'>
+        <label>Name:</label>
+        <input type="text" name="name"><br>
+        <label>Type:</label>
+        <input type="text" name="type"><br>
+        <br />
+        <label>Target pH Low:</label>
+        <input type="number" step="0.1" name="target_ph_low"><br>
+        <label>Target pH High:</label>
+        <input type="number" step="0.1" name="target_ph_high"><br>
+        <label>Target EC Low:</label>
+        <input type="number" step="0.1" name="target_ec_low"><br>
+        <label>Target EC High:</label>
+        <input type="number" step="0.1" name="target_ec_high"><br>
+        <div class="button-center">
+            <button type="submit">Submit</button>
+        </div>
+
+    </form>
+{{end}}
