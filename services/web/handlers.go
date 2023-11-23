@@ -432,3 +432,63 @@ func (app *application) createTowerProcess(w http.ResponseWriter, r *http.Reques
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
+
+func (app *application) deleteTower(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		app.deleteTowerForm(w, r)
+	case http.MethodPost:
+		app.deleteTowerProcess(w, r)
+	default:
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+	}
+}
+
+func (app *application) deleteTowerForm(w http.ResponseWriter, r *http.Request) {
+	files := []string{
+		"./ui/html/base.html",
+		"./ui/html/partials/nav.html",
+		"./ui/html/pages/tower-delete.html",
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
+	err = ts.ExecuteTemplate(w, "base", nil)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
+}
+
+func (app *application) deleteTowerProcess(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("processing the delete tower form")
+	towerId := r.PostFormValue("id")
+	if towerId == "" {
+		fmt.Println("towerId error")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	req, _ := http.NewRequest("DELETE", app.towerInfo.CommandEndpoint+"/"+towerId, nil)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("client.do error")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		log.Printf("unexpected status: %s when attempting to delete ID: %s", resp.Status, towerId)
+	}
+
+	http.Redirect(w, r, "/towers", http.StatusSeeOther)
+}

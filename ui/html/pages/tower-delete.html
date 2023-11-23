@@ -1,0 +1,12 @@
+{{define "title"}}Delete a Tower{{end}}
+
+{{define "page-header"}}Delete a Tower{{end}}
+
+{{define "main"}}
+    <form action="/tower/delete" method="post">
+        <label for="id">Tower ID:&nbsp</label>
+        <input type="text" name="id" id="id">&nbsp
+        <button type="submit">Delete</button>
+    </form>
+
+{{end}}
