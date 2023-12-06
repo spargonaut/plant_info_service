@@ -1,0 +1,38 @@
+name: Farmstand Tracker - Main Build
+on: [push]
+jobs:
+  Build-Plant-Info:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Calculate Short Hash
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Echo the short hash
+        run: echo ${{ steps.vars.outputs.sha_short }}
+
+      - name: Build the Plant Info API image
+        run: docker build -f plantinfo.api.Dockerfile -t fishtank.spargonaut.wtf/plantinfo.api:0.0.1 .
+
+      - name: Tag the Image with the commit hash
+        run: docker tag fishtank.spargonaut.wtf/plantinfo.api:0.0.1 fishtank.spargonaut.wtf/plantinfo.api:${{ steps.vars.outputs.sha_short }}
+
+      - name: Tag the Image as latest
+        run: docker tag fishtank.spargonaut.wtf/plantinfo.api:0.0.1 fishtank.spargonaut.wtf/plantinfo.api:latest
+
+      - name: Log into the private registry
+        uses: docker/login-action@v3
+        with:
+          registry: fishtank.spargonaut.wtf
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push the Plant Info API hashed image
+        run: docker push fishtank.spargonaut.wtf/plantinfo.api:${{ steps.vars.outputs.sha_short }}
+
+      - name: Push the Plant Info API latest image
+        run: docker push fishtank.spargonaut.wtf/plantinfo.api:latest
